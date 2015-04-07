@@ -4,6 +4,7 @@ define("LEGACY_DATABASE", 'legacy');
 
 // Debug helper to test migrating one topic
 define("TOPIC_ID", 6567);
+define('MIGRATE_ONE_TOPIC', 0);
 
 
 /**
@@ -22,7 +23,9 @@ class ForumTopicMigration extends Migration {
     $query->condition('n.type', 'forum');
 
     //TODO: debug hack!
-    $query->condition('n.nid', TOPIC_ID);
+    if (MIGRATE_ONE_TOPIC) {
+      $query->condition('n.nid', TOPIC_ID);
+    }
 
     // Set source and destination.
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
@@ -73,7 +76,9 @@ class ForumPostMigration extends Migration {
     $query->condition('n.type', 'forum');
 
     //TODO: debug hack!
-    $query->condition('n.nid', TOPIC_ID);
+    if (MIGRATE_ONE_TOPIC) {
+      $query->condition('n.nid', TOPIC_ID);
+    }
 
     // Set source and destination.
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
