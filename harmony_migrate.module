@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file harmony_migrate.module
+ */
+
+/**
+ * Intentionally left empty, see harmony_migrate.migrate.inc
+ * for the actual implementation.
+ *
+ * @link https://drupal.org/node/1006982
+ */

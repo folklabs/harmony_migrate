@@ -1,0 +1,12 @@
+name = "Harmony Migrate"
+description = "Migrate forum content from D6 site to D7."
+package = "Harmony"
+core = 7.x
+
+dependencies[] = harmony_core
+dependencies[] = migrate
+dependencies[] = migrate_d2d
+dependencies[] = migrate_extras
+
+files[] = harmony_migrate.migrate.inc
+files[] = node.inc
