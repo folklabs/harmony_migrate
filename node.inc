@@ -14,8 +14,11 @@ class ForumTopicMigration extends Migration {
                         ->select('node', 'n');
     $query->innerJoin('node_revisions', 'nr', 'n.vid=nr.vid');
     $query->leftJoin('forum', 'f', 'n.vid=f.vid');
+    // Assume the node counter table is present.
+    $query->leftJoin('node_counter', 'nc', 'n.vid=nc.nid');
     $query->fields('n', array('nid','vid', 'uid', 'created', 'changed'));
     $query->fields('nr', array('title'));
+    $query->fields('nc', array('totalcount'));
     $query->condition('n.type', 'forum');
 
     // Set source and destination.
@@ -43,10 +46,11 @@ class ForumTopicMigration extends Migration {
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'created');
     $this->addFieldMapping('updated', 'changed');
+    $this->addFieldMapping('views', 'totalcount');
     $this->addFieldMapping('field_harmony_post_count')->defaultValue(0);
 
     $this->addUnmigratedDestinations(array('status', 'type', 'locked', 'hidden',
-      'pinned', 'favourites', 'likes', 'views', 'field_harmony_thread_cont_from'));
+      'pinned', 'favourites', 'likes', 'field_harmony_thread_cont_from'));
   }
 }
 
