@@ -2,10 +2,6 @@
 
 define("LEGACY_DATABASE", 'legacy');
 
-// Debug helper to test migrating one topic
-define("TOPIC_ID", 6567);
-define('MIGRATE_ONE_TOPIC', 0);
-
 
 /**
  * Creates Harmony threads based on Forum topics.
@@ -21,11 +17,6 @@ class ForumTopicMigration extends Migration {
     $query->fields('n', array('nid','vid', 'uid', 'created', 'changed'));
     $query->fields('nr', array('title'));
     $query->condition('n.type', 'forum');
-
-    //TODO: debug hack!
-    if (MIGRATE_ONE_TOPIC) {
-      $query->condition('n.nid', TOPIC_ID);
-    }
 
     // Set source and destination.
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
@@ -75,18 +66,13 @@ class ForumPostMigration extends Migration {
     $query->fields('nr', array('body'));
     $query->condition('n.type', 'forum');
 
-    //TODO: debug hack!
-    if (MIGRATE_ONE_TOPIC) {
-      $query->condition('n.nid', TOPIC_ID);
-    }
-
     // Set source and destination.
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
     $this->destination = new MigrateDestinationEntityAPI(
       'harmony_post',  // Entity type
       'harmony_post'   // bundle
     );
-    // Set up database maping.
+    // Set up database mapping.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'nid' => array(
@@ -100,7 +86,6 @@ class ForumPostMigration extends Migration {
       MigrateDestinationEntityAPI::getKeySchema('harmony_post')
     );
 
-    $this->addFieldMapping('post_id', 'nid');
     $this->addFieldMapping('uid', 'uid');
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'created');
@@ -144,16 +129,13 @@ class ForumCommentMigration extends Migration {
     $query->fields('n', array('type', 'title'));
     $query->condition('n.type', 'forum');
 
-    //TODO: debug hack!
-    $query->condition('n.nid', TOPIC_ID);
-
     // Set source and destination.
     $this->source = new MigrateSourceSQL($query, array(), NULL, array('map_joinable' => FALSE));
     $this->destination = new MigrateDestinationEntityAPI(
       'harmony_post',  // Entity type
       'harmony_post'   // bundle
     );
-    // Set up database maping.
+    // Set up database mapping.
     $this->map = new MigrateSQLMap($this->machineName,
       array(
         'cid' => array(
@@ -167,18 +149,14 @@ class ForumCommentMigration extends Migration {
       MigrateDestinationEntityAPI::getKeySchema('harmony_post')
     );
 
-    $this->addFieldMapping('post_id', 'cid');
     $this->addFieldMapping('uid', 'uid');
     // The subject is migrated to title, but title is not visible by default in harmony_post.
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'timestamp');
     $this->addFieldMapping('field_harmony_text', 'comment');
-
     $this->addFieldMapping('field_harmony_thread', 'nid')
       ->sourceMigration('topic');
-
     $this->addFieldMapping('field_harmony_post_is_reply_to', 'nid');
-      // ->sourceMigration('post');
 
     $this->addUnmigratedDestinations(array('status', 'locked', 'hidden',
       'hostname', 'log_show', 'updated', 'log', 'revision'));
@@ -194,14 +172,17 @@ class ForumCommentMigration extends Migration {
     else {
       $post_parent_id = $this->handleSourceMigration(array('post'), $row->nid);
     }
-    $entity->field_harmony_post_is_reply_to['und'][0]['target_id'] = $post_parent_id['destid1'];
+    if (is_array($post_parent_id)) {
+      $post_parent_id = $post_parent_id['destid1'];
+    }
+    $entity->field_harmony_post_is_reply_to['und'][0]['target_id'] = $post_parent_id;
   }
 
   protected function createStub($migration, $source_id) {
     $entity_type = 'harmony_post';
     $entity = entity_create($entity_type, array('type' => 'harmony_post'));
     $wrapper = entity_metadata_wrapper($entity_type, $entity);
-    $wrapper->title = t('Stub for @id', array('@id' => $source_id));
+    $wrapper->title = t('Stub for @id', array('@id' => $source_id[0]));
     $wrapper->status = 1;
     $wrapper->uid = 1;
 
