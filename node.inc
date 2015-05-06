@@ -42,7 +42,8 @@ class ForumTopicMigration extends Migration {
     );
 
     $this->addFieldMapping('thread_id', 'nid');
-    $this->addFieldMapping('uid', 'uid');
+    $this->addFieldMapping('uid', 'uid')
+      ->sourceMigration('User');
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'created');
     $this->addFieldMapping('updated', 'changed');
@@ -90,7 +91,8 @@ class ForumPostMigration extends Migration {
       MigrateDestinationEntityAPI::getKeySchema('harmony_post')
     );
 
-    $this->addFieldMapping('uid', 'uid');
+    $this->addFieldMapping('uid', 'uid')
+      ->sourceMigration('User');
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'created');
     $this->addFieldMapping('updated', 'changed');
@@ -153,7 +155,8 @@ class ForumCommentMigration extends Migration {
       MigrateDestinationEntityAPI::getKeySchema('harmony_post')
     );
 
-    $this->addFieldMapping('uid', 'uid');
+    $this->addFieldMapping('uid', 'uid')
+      ->sourceMigration('User');
     // The subject is migrated to title, but title is not visible by default in harmony_post.
     $this->addFieldMapping('title', 'title');
     $this->addFieldMapping('created', 'timestamp');
